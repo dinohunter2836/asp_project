@@ -14,5 +14,6 @@ namespace WebApp.Models
         }
 
         public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
     }
 }
