@@ -1,0 +1,51 @@
+﻿@model IEnumerable<WebApp.Models.Comment>
+@{
+    ViewData["Title"] = "Comments";
+    string postId = ViewBag.PostId;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="jumbotron bg-light">
+    <h2 class="text-center text-primary">
+        <i class="fab fa-facebook-messenger"></i>&nbsp; Posts
+    </h2>
+
+    <div class="row">
+        <form method="post">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="form-group">
+                    <a class="btn" asp-controller="Comments" asp-action="CreateComment" asp-route-id=@postId>Add comment</a>
+                </div>
+            }
+        </form>
+        <div class="col-md-12" id="chat">
+            @if (Model != null)
+            {
+                @foreach (var comment in Model.OrderByDescending(m => m.Time))
+                {
+                    <div class="row">
+                        <div class="">
+                            <div class="container bg-light">
+                                <p class="sender text-left">@comment.UserName</p>
+                                <p class="text-left">@comment.Text</p>
+                                <span class="time-left">@comment.Time.ToString()</span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    if (User.Identity.IsAuthenticated && User.Identity.Name == comment.UserName)
+                    {
+                        <div class="form-group">
+                            <a class="btn" asp-controller="Comments" asp-action="DeleteComment" asp-route-id=@comment.Id>Delete comment</a>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+
+</div>
+
