@@ -7,14 +7,17 @@ using WebApp.Models;
 
 namespace WebApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -22,7 +25,14 @@ namespace WebApp.Data
                 .HasOne<AppUser>(a => a.Sender)
                 .WithMany(d => d.Messages)
                 .HasForeignKey(d => d.UserID);
+            builder.Entity<Post>()
+                .HasOne<AppUser>(a => a.User)
+                .WithMany(d => d.Posts)
+                .HasForeignKey(d => d.UserId);
+            builder.Entity<Comment>()
+                .HasOne<Post>(a => a.Post)
+                .WithMany(d => d.Comments)
+                .HasForeignKey(d => d.PostId);
         }
     }
-
 }

@@ -13,10 +13,12 @@ namespace WebApp.Models
         public string UserId { get; set; }
         public virtual AppUser User { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
+        public string UserName { get; set; }
 
         public Post()
         {
             Time = DateTime.Now;
+            Comments = new HashSet<Comment>();
         }
     }
 }

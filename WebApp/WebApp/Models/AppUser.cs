@@ -11,6 +11,7 @@ namespace WebApp.Models
         public AppUser()
         {
             Messages = new HashSet<Message>();
+            Posts = new HashSet<Post>();
         }
 
         public virtual ICollection<Message> Messages { get; set; }
