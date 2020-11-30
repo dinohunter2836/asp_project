@@ -33,7 +33,8 @@ namespace WebApp
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+              .AddRoles<IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
@@ -66,7 +67,13 @@ namespace WebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapHub<ChatHub>("/Home/Index");
+                endpoints.MapControllerRoute(
+                    name: "default_admin",
+                    pattern: "{controller=Admin}/{action=Admin}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default_comments",
+                    pattern: "{controller=RecentPosts}/{action=ResentPosts}/{id}");
+                endpoints.MapHub<ChatHub>("/ChatHub");
                 endpoints.MapRazorPages();
             });
         }
