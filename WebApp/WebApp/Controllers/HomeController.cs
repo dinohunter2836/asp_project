@@ -37,18 +37,21 @@ namespace WebApp.Controllers
             return View(messages);
         }
 
-        public async Task<IActionResult> Create(Message message)
+        [HttpGet]
+        [Route("/Home/DeleteMessage/{messageId}")]
+        public IActionResult DeleteMessage(string messageId)
         {
-            if (ModelState.IsValid)
-            {
-                message.UserName = User.Identity.Name;
-                var sender = await _userManager.GetUserAsync(User);
-                message.UserID = sender.Id;
-                await _context.Messages.AddAsync(message);
-                await _context.SaveChangesAsync();
-                return Ok();
-            }
-            return Error();
+            var message = _context.Messages.Find(int.Parse(messageId));
+            return View(message);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            var message = _context.Messages.Find(id);
+            _context.Messages.Remove(message);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -94,7 +97,7 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeletePost(int id)
+        public async Task<IActionResult> DeletePost(int id)
         {
             var post = _context.Posts.Find(id);
             _context.Posts.Remove(post);
@@ -102,7 +105,7 @@ namespace WebApp.Controllers
             {
                 _context.Comments.Remove(comment);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return RedirectToAction("Privacy");
         }
 
