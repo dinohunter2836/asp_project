@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class CommentsController : Controller
     {
         private readonly ILogger<RecentPostsController> _logger;
@@ -33,6 +35,18 @@ namespace WebApp.Controllers
                 .OrderByDescending(c => c.Time);
             return View(comments);
         }
+
+        [HttpGet]
+        [Route("/Comments/UserComments/{userId}")]
+        public IActionResult UserComments(string userId)
+        {
+            var user = _context.Users.Find(userId);
+            var comments = _context.Comments.Where(c => c.UserName == user.UserName)
+                .OrderByDescending(c => c.Time);
+            ViewBag.UserId = userId;
+            return View(comments);
+        }
+
 
         [HttpGet]
         [Route("/Comments/CreateComment/{postId}")]
@@ -64,6 +78,8 @@ namespace WebApp.Controllers
         public IActionResult DeleteComment(string commentId)
         {
             var comment = _context.Comments.Find(int.Parse(commentId));
+            var post = _context.Posts.Find(comment.PostId);
+            ViewBag.UserId = post.UserId;
             return View(comment);
         }
 
@@ -75,6 +91,24 @@ namespace WebApp.Controllers
             _context.Comments.Remove(comment);
             _context.SaveChanges();
             return RedirectToAction("Comments", new { postId = post.Id });
+        }
+
+        [HttpGet]
+        [Route("/Comments/DeleteUserComment/{commentId}")]
+        public IActionResult DeleteUserComment(string commentId)
+        {
+            var comment = _context.Comments.Find(int.Parse(commentId));
+            return View(comment);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteUserComment(int id)
+        {
+            var comment = _context.Comments.Find(id);
+            var userId = _context.Posts.Find(comment.PostId).UserId;
+            _context.Comments.Remove(comment);
+            _context.SaveChanges();
+            return RedirectToAction("UserComments", new { userId });
         }
 
 

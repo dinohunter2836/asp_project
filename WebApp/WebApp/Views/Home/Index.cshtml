@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Chat Page";
     var userName = User.Identity.Name;
+    var userId = ViewBag.UserId;
 }
 
 <div class="jumbotron bg-light">
@@ -63,6 +64,7 @@
             <div class="form-group">
                 <input type="button" value="Send" id="submitButton" class="btn" />
             </div>
+            <input type="hidden" value="@userId" id="userId" />
             <input type="hidden" value="@userName" id="username" />
         </div>
     </div>

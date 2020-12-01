@@ -79,6 +79,39 @@ namespace WebApp.Controllers
             return RedirectToAction("Posts");
         }
 
+        [HttpGet]
+        [Route("/Posts/UserPosts/{userId}")]
+        public IActionResult UserPosts(string userId)
+        {
+            var user = _context.Users.Find(userId);
+            var posts = _context.Posts.Where(a => a.UserId == userId);
+            ViewBag.CurrentUserName = user.UserName;
+            return View(posts);
+        }
+
+        [HttpGet]
+        [Route("/Posts/DeleteUserPost/{postId}")]
+        public IActionResult DeleteUserPost(string postId)
+        {
+            var post = _context.Posts.Find(int.Parse(postId));
+            ViewBag.UserId = post.UserId;
+            return View(post);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserPost(int id)
+        {
+            var post = _context.Posts.Find(id);
+            string userId = post.UserId;
+            _context.Posts.Remove(post);
+            foreach (var comment in _context.Comments.Where(c => c.PostId == id))
+            {
+                _context.Comments.Remove(comment);
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("UserPosts", new { userId });
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

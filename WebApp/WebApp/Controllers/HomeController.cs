@@ -33,6 +33,7 @@ namespace WebApp.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 ViewBag.CurrentUserName = currentUser.UserName;
+                ViewBag.UserId = currentUser.Id;
             }
             return View(messages);
         }
