@@ -1,0 +1,54 @@
+﻿@model IEnumerable<WebApp.Models.Message>
+@{
+    ViewData["Title"] = "Chat Page";
+    string userId = ViewBag.UserId;
+}
+
+<div class="jumbotron bg-light">
+    <h2 class="text-center text-primary">
+        <i class="fab fa-facebook-messenger"></i>&nbsp; Messages
+    </h2>
+
+    <a class="btn" asp-controller="Admin" asp-action="GiveModRole" asp-route-id="@userId" >
+        Grant moderator privilage
+    </a>
+
+    <a class="btn" asp-controller="Admin" asp-action="RemoveModRole" asp-route-id="@userId" >
+        Withdraw moderator privilage
+    </a>
+
+    <div class="row">
+        <div class="col-md-12" id="chat">
+            @if (Model != null)
+            {
+                @foreach (var message in Model)
+                {
+                    string containerClass, timePosition, textAlign, contcolor, offset;
+                    containerClass = "container";
+                    timePosition = "time-left";
+                    textAlign = "text-left";
+                    contcolor = "bg-light";
+                    offset = "";
+
+                    <div class="row">
+                        <div class="@offset">
+                            <div class="@containerClass @contcolor">
+                                <p class="sender @textAlign">@message.UserName</p>
+                                <p class="@textAlign">@message.Text</p>
+                                <span class="@timePosition">@message.Time.ToString()</span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="@offset">
+
+                        <a class="btn" asp-area="" asp-controller="Admin" asp-action="DeleteMessage" asp-route-id=@message.Id.ToString()>
+                            Delete
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

@@ -16,6 +16,7 @@ document.getElementById("submitButton").disabled = true;
 const username = document.getElementById('username').value;
 const textinput = document.getElementById('messageText');
 const chat = document.getElementById('chat');
+const userId = document.getElementsByClassName('userId');
 
 connection.on('receiveMessage', function (message)  {
     let isCurrentUserMessage = message.userName === username;
@@ -56,6 +57,7 @@ document.getElementById('submitButton').addEventListener('click', () => {
     var when = new Date();
     var message = new Message(username, textinput.value, when);
     var currentdate = new Date();
+    message.user = userId;
     when.innerHtml =
         (currentdate.getMonth() + 1) + "/"
         + currentdate.getDate() + "/"

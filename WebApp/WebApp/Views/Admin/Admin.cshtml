@@ -1,0 +1,19 @@
+﻿@model IEnumerable<AppUser>
+
+@{
+    ViewData["Title"] = "Admin";
+}
+<h1>Admin Home Page</h1>
+
+@foreach (AppUser user in Model.OrderBy(u => u.UserName))
+{
+    <div class="row">
+        <div class="">
+            <div class="container bg-light">
+                <a class="btn" asp-area="" asp-controller="Posts" asp-action="UserPosts" asp-route-id=@user.Id>Posts by @user.UserName</a>
+                <a class="btn" asp-area="" asp-controller="Comments" asp-action="UserComments" asp-route-id=@user.Id>Comments by @user.UserName</a>
+                <a class="btn" asp-area="" asp-controller="Admin" asp-action="UserMessages" asp-route-id=@user.Id>Messages from @user.UserName</a>
+            </div>
+        </div>
+    </div>
+}

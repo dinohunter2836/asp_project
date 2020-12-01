@@ -10,17 +10,26 @@
     </h2>
 
     <div class="row">
+        <form method="post">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="form-group">
+                    <a class="btn" asp-area="" asp-controller="Posts" asp-action="CreatePost">Create new post</a>
+                </div>
+            }
+        </form>
         <div class="col-md-12" id="chat">
             @if (Model != null)
             {
-                @foreach (var post in Model.OrderByDescending(m => m.Time))
+                @foreach (var post in Model.Where(m => m.User.UserName == User.Identity.Name).OrderByDescending(m => m.Time))
                 {
                     <div class="row">
                         <div class="">
                             <div class="container bg-light">
-                                <p class="sender text-left">@post.UserName</p>
+                                <p class="sender text-left">@User.Identity.Name</p>
                                 <p class="text-left">@post.Text</p>
                                 <span class="time-left">@post.Time.ToString()</span>
+
                             </div>
                         </div>
                     </div>
@@ -28,12 +37,9 @@
                         <a class="btn" asp-area="" asp-controller="Comments" asp-action="Comments" asp-route-id=@post.Id.ToString()>
                             Comments
                         </a>
-                        @if (User.IsInRole("admin"))
-                        {
-                            <a class="btn" asp-area="" asp-controller="Posts" asp-action="DeletePost" asp-route-id=@post.Id.ToString()>
-                                Delete
-                            </a>
-                        }
+                        <a class="btn" asp-area="" asp-controller="Posts" asp-action="DeletePost" asp-route-id=@post.Id.ToString()>
+                            Delete
+                        </a>
                     </div>
                 }
             }
@@ -41,3 +47,4 @@
     </div>
 
 </div>
+

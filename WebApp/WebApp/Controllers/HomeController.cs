@@ -33,77 +33,26 @@ namespace WebApp.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 ViewBag.CurrentUserName = currentUser.UserName;
+                ViewBag.UserId = currentUser.Id;
             }
             return View(messages);
         }
 
-        public async Task<IActionResult> Create(Message message)
-        {
-            if (ModelState.IsValid)
-            {
-                message.UserName = User.Identity.Name;
-                var sender = await _userManager.GetUserAsync(User);
-                message.UserID = sender.Id;
-                await _context.Messages.AddAsync(message);
-                await _context.SaveChangesAsync();
-                return Ok();
-            }
-            return Error();
-        }
-
         [HttpGet]
-        public async Task<IActionResult> Privacy()
+        [Route("/Home/DeleteMessage/{messageId}")]
+        public IActionResult DeleteMessage(string messageId)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-            var posts = _context.Posts.Where(a => a.User.Id == currentUser.Id);
-            if (User.Identity.IsAuthenticated)
-            {
-                ViewBag.CurrentUserName = currentUser.UserName;
-            }
-            return View(posts);
-        }
-
-        [HttpGet]
-        public IActionResult CreatePost()
-        {
-            return View();
+            var message = _context.Messages.Find(int.Parse(messageId));
+            return View(message);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePost(Post post)
+        public async Task<IActionResult> DeleteMessage(int id)
         {
-            if (ModelState.IsValid)
-            {
-                var sender = await _userManager.GetUserAsync(User);
-                post.User = sender;
-                post.UserId = sender.Id;
-                post.UserName = sender.UserName;
-                await _context.Posts.AddAsync(post);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Privacy");
-            }
-            return Error();
-        }
-
-        [HttpGet]
-        [Route("/Home/DeletePost/{postId}")]
-        public IActionResult DeletePost(string postId)
-        {
-            var post = _context.Posts.Find(int.Parse(postId));
-            return View(post);
-        }
-
-        [HttpPost]
-        public IActionResult DeletePost(int id)
-        {
-            var post = _context.Posts.Find(id);
-            _context.Posts.Remove(post);
-            foreach (var comment in _context.Comments.Where(c => c.PostId == id))
-            {
-                _context.Comments.Remove(comment);
-            }
-            _context.SaveChanges();
-            return RedirectToAction("Privacy");
+            var message = _context.Messages.Find(id);
+            _context.Messages.Remove(message);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -2,19 +2,13 @@
 @{
     ViewData["Title"] = "Chat Page";
     var userName = User.Identity.Name;
+    var userId = ViewBag.UserId;
 }
 
 <div class="jumbotron bg-light">
     <h2 class="text-center text-primary">
         <i class="fab fa-facebook-messenger"></i>&nbsp; Public Chat Room
     </h2>
-
-    @if (User.IsInRole("admin"))
-    {
-        <div class="form-group">
-            <a class="btn" asp-area="" asp-controller="Admin" asp-action="Admin">Admin home page</a>
-        </div>
-    }
 
     <div class="row">
         <div class="col-md-12" id="chat">
@@ -50,6 +44,16 @@
                             </div>
                         </div>
                     </div>
+
+                    if (User.IsInRole("admin") || User.IsInRole("chatModerator"))
+                    {
+                        <div class="@offset">
+                            
+                            <a class="btn" asp-area="" asp-controller="Home" asp-action="DeleteMessage" asp-route-id=@message.Id.ToString()>
+                                Delete
+                            </a>
+                        </div>
+                    }
                 }
             }
         </div>
@@ -60,45 +64,11 @@
             <div class="form-group">
                 <input type="button" value="Send" id="submitButton" class="btn" />
             </div>
+            <input type="hidden" value="@userId" id="userId" />
             <input type="hidden" value="@userName" id="username" />
         </div>
     </div>
 </div>
 
-@*<script src="~/lib/signalr/signalr.min.js"></script>*@
 <script src="~/signalr/signalr.js"></script>
 <script src="~/js/signalrReqHandler.js"></script>
-@*<script src="~/lib/jquery/dist/jquery.unobtrusive-ajax.min.js" />*@
-
-@*<div class="container">
-        <div class="row">&nbsp;</div>
-        <div class="row">
-            <div class="col-2">User</div>
-            <div class="col-4"><input type="text" id="userInput" /></div>
-        </div>
-        <div class="row">
-            <div class="col-2">Message</div>
-            <div class="col-4"><input type="text" id="messageInput" /></div>
-        </div>
-        <div class="row">&nbsp;</div>
-        <div class="row">
-            <div class="col-6">
-                <input type="button" id="sendButton" value="Send Message" />
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <hr />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
-        </div>
-    </div>
-
-    <script src="~/signalr/signalr.js"></script>
-    <script src="~/js/signalrReqHandler.js"></script>*@
