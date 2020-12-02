@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApp.Hubs;
 using WebApp.Models;
+using WebApp.Services;
 
 namespace WebApp
 {
@@ -34,8 +35,10 @@ namespace WebApp
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
               .AddRoles<IdentityRole>()
-              .AddEntityFrameworkStores<ApplicationDbContext>();
+              .AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
             services.AddControllersWithViews();
+            services.AddSingleton<IEmailSender, EmailService>();
             services.AddRazorPages();
             services.AddSignalR();
         }
