@@ -24,7 +24,8 @@ namespace WebApp
                 {
                     var userManager = services.GetRequiredService<UserManager<AppUser>>();
                     var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    await AdminInitializer.InitializeAsync(userManager, rolesManager);
+                    await AdminInitializer.InitializeAsync(userManager, rolesManager, 
+                        services.GetRequiredService<IConfiguration>());
                 }
                 catch (Exception ex)
                 {

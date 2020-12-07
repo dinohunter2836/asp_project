@@ -41,7 +41,7 @@ namespace WebApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
-                return Error();
+                return NotFound();
             }
         }
 
@@ -60,7 +60,7 @@ namespace WebApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
-                return Error();
+                return NotFound();
             }
         }
 
@@ -99,7 +99,7 @@ namespace WebApp.Controllers
             {
                 _logger.LogError(e.Message);
             }
-            return Error();
+            return NotFound();
         }
 
         [HttpGet]
@@ -127,7 +127,7 @@ namespace WebApp.Controllers
             catch (Exception e)
             {
                 _logger.LogTrace(e.Message);
-                return Error();
+                return NotFound();
             }
         }
 
@@ -154,14 +154,8 @@ namespace WebApp.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
-                return Error();
+                return NotFound();
             }
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

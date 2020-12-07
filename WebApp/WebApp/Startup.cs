@@ -39,15 +39,16 @@ namespace WebApp
               .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
             services.AddControllersWithViews();
+            services.AddSingleton<Logger>();
             services.AddTransient<IEmailSender, EmailService>();
             services.AddRazorPages();
             services.AddSignalR();
-            services.AddSingleton<Logger>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            env.EnvironmentName = "Development";
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -55,7 +56,8 @@ namespace WebApp
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                // app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
