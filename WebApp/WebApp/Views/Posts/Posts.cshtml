@@ -28,7 +28,7 @@
                             <div class="container bg-light">
                                 <p class="sender text-left">@User.Identity.Name</p>
                                 <p class="text-left">@post.Text</p>
-                                <span class="time-left">@post.Time.ToString()</span>
+                                <span class="time-left">@post.Time.ToLocalTime().ToString()</span>
 
                             </div>
                         </div>

@@ -39,7 +39,7 @@
                             <div class="@containerClass @contcolor">
                                 <p class="sender @textAlign">@message.UserName</p>
                                 <p class="@textAlign">@message.Text</p>
-                                <span class="@timePosition">@message.Time.ToString()</span>
+                                <span class="@timePosition">@message.Time.ToLocalTime().ToString()</span>
 
                             </div>
                         </div>

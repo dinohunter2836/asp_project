@@ -30,7 +30,7 @@
                             <div class="container bg-light">
                                 <p class="sender text-left">@comment.UserName</p>
                                 <p class="text-left">@comment.Text</p>
-                                <span class="time-left">@comment.Time.ToString()</span>
+                                <span class="time-left">@comment.Time.ToLocalTime().ToString()</span>
 
                             </div>
                         </div>
