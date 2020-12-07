@@ -18,6 +18,8 @@ namespace WebApp.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+
+        public DbSet<PrivateMessage> PrivateMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -33,6 +35,10 @@ namespace WebApp.Data
                 .HasOne<Post>(a => a.Post)
                 .WithMany(d => d.Comments)
                 .HasForeignKey(d => d.PostId);
+            builder.Entity<PrivateMessage>()
+                .HasOne<AppUser>(a => a.Sender)
+                .WithMany(u => u.PrivateMessages)
+                .HasForeignKey(a => a.SenderID);
         }
     }
 }

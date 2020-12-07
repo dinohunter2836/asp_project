@@ -29,6 +29,5 @@ namespace WebApp.Hubs
             await _context.SaveChangesAsync();
             await Clients.All.SendAsync("receiveMessage", message);
         }
-
     }
 }
