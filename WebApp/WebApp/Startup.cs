@@ -41,6 +41,7 @@ namespace WebApp
             services.AddControllersWithViews();
             services.AddSingleton<Logger>();
             services.AddTransient<IEmailSender, EmailService>();
+            services.AddScoped<IdCombiner>();
             services.AddRazorPages();
             services.AddSignalR();
         }

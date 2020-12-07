@@ -21,12 +21,15 @@ namespace WebApp.Controllers
         private readonly Logger _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IdCombiner _combiner;
 
-        public PrivateMessagesController(ApplicationDbContext context, Logger logger, UserManager<AppUser> manager)
+        public PrivateMessagesController(ApplicationDbContext context, Logger logger, UserManager<AppUser> manager,
+            IdCombiner combiner)
         {
             _userManager = manager;
             _logger = logger;
             _context = context;
+            _combiner = combiner;
         }
 
         [HttpGet]
@@ -47,14 +50,7 @@ namespace WebApp.Controllers
             var user = await _userManager.GetUserAsync(User);
             var userId = user.Id;
             string secondUserId = holder.secondUserId;
-            string combinedId;
-            if (userId.CompareTo(secondUserId) > 0)
-            {
-                combinedId = userId + "_" + secondUserId;
-            } else
-            {
-                combinedId = secondUserId + "_" + userId;
-            }
+            string combinedId = _combiner.CombineIds(userId, secondUserId);
             return RedirectToAction("Chat", new { combinedId });
         }
 
@@ -63,10 +59,8 @@ namespace WebApp.Controllers
         {
             try
             {
-                string[] ids = combinedId.Split('_');
                 var sender = await _userManager.GetUserAsync(User);
-                var receiver = ids[0] == sender.Id ? await _context.Users.FindAsync(ids[1]) :
-                    await _context.Users.FindAsync(ids[0]);
+                var receiver = await _context.Users.FindAsync(_combiner.SplitIds(combinedId, sender));
                 ViewBag.CombinedId = combinedId;
                 ViewBag.ReceiverUserName = receiver.UserName;
 
