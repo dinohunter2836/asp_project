@@ -39,7 +39,7 @@ namespace WebApp
               .AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
             services.AddControllersWithViews();
-            services.AddSingleton<IEmailSender, EmailService>();
+            services.AddTransient<IEmailSender, EmailService>();
             services.AddRazorPages();
             services.AddSignalR();
             services.AddSingleton<Logger>();
@@ -79,6 +79,7 @@ namespace WebApp
                     name: "default_comments",
                     pattern: "{controller=RecentPosts}/{action=ResentPosts}/{id}");
                 endpoints.MapHub<ChatHub>("/ChatHub");
+                endpoints.MapHub<PrivateChatHub>("/PrivateChatHub");
                 endpoints.MapRazorPages();
             });
         }

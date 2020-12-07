@@ -1,0 +1,24 @@
+﻿@model WebApp.ViewModels.SelectUserViewModel
+
+@{
+    ViewData["Title"] = "Private chats";
+}
+<h1>Choose person to chat with</h1>
+
+
+<form asp-controller="PrivateMessages" asp-action="Users">
+    <div class="row">
+        <div class="">
+            <div class="container bg-light">
+                <div class="form-group">
+                    <div class="form-group">
+                        <select asp-for="secondUserId"
+                                asp-items="@Model.Users">
+                        </select>
+                        <input type="submit" class="btn btn-primary" value="Go to conversation"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

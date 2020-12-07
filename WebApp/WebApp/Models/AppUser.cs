@@ -12,9 +12,12 @@ namespace WebApp.Models
         {
             Messages = new HashSet<Message>();
             Posts = new HashSet<Post>();
+            PrivateMessages = new HashSet<PrivateMessage>();
         }
 
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
+
+        public virtual ICollection<PrivateMessage> PrivateMessages { get; set; }
     }
 }
