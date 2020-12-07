@@ -20,7 +20,7 @@ namespace WebApp.Models
 
         public Message()
         {
-            Time = DateTime.Now;
+            Time = DateTime.Now.ToUniversalTime();
         }
     }
 }

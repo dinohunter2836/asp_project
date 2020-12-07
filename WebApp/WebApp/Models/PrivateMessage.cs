@@ -21,7 +21,7 @@ namespace WebApp.Models
 
         public PrivateMessage()
         {
-            Time = DateTime.Now;
+            Time = DateTime.Now.ToUniversalTime();
         }
     }
 }

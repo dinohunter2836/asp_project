@@ -17,7 +17,7 @@ namespace WebApp.Models
 
         public Post()
         {
-            Time = DateTime.Now;
+            Time = DateTime.Now.ToUniversalTime();
             Comments = new HashSet<Comment>();
         }
     }

@@ -16,7 +16,7 @@ namespace WebApp.Models
 
         public Comment()
         {
-            Time = DateTime.Now;
+            Time = DateTime.Now.ToUniversalTime();
         }
     }
 }
