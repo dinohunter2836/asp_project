@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using WebApp.Hubs;
 using WebApp.Models;
 using WebApp.Services;
+using Microsoft.Extensions.Logging;
 
 namespace WebApp
 {
@@ -41,6 +42,7 @@ namespace WebApp
             services.AddSingleton<IEmailSender, EmailService>();
             services.AddRazorPages();
             services.AddSignalR();
+            services.AddSingleton<Logger>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

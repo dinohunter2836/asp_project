@@ -9,17 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApp.Data;
 using WebApp.Models;
+using WebApp.Services;
 
 namespace WebApp.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly Logger _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public HomeController(ApplicationDbContext context, ILogger<HomeController> logger, UserManager<AppUser> manager)
+        public HomeController(ApplicationDbContext context, Logger logger, UserManager<AppUser> manager)
         {
             _userManager = manager;
             _logger = logger;
@@ -35,6 +36,7 @@ namespace WebApp.Controllers
                 ViewBag.CurrentUserName = currentUser.UserName;
                 ViewBag.UserId = currentUser.Id;
             }
+            _logger.LogError("Something went wrong");
             return View(messages);
         }
 
