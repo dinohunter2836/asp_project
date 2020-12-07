@@ -53,8 +53,10 @@ namespace WebApp.Controllers
                 post.UserName = sender.UserName;
                 await _context.Posts.AddAsync(post);
                 await _context.SaveChangesAsync();
+                _logger.LogTrace($"User {post.UserName} created post saying {post.Text}");
                 return RedirectToAction("Posts");
             }
+            _logger.LogError($"Failed to create post");
             return Error();
         }
 
@@ -69,14 +71,23 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> DeletePost(int id)
         {
-            var post = _context.Posts.Find(id);
-            _context.Posts.Remove(post);
-            foreach (var comment in _context.Comments.Where(c => c.PostId == id))
+            try
             {
-                _context.Comments.Remove(comment);
+                var post = _context.Posts.Find(id);
+                _context.Posts.Remove(post);
+                foreach (var comment in _context.Comments.Where(c => c.PostId == id))
+                {
+                    _context.Comments.Remove(comment);
+                }
+                await _context.SaveChangesAsync();
+                _logger.LogTrace($"User {post.UserName} deleted post saying {post.Text}");
+                return RedirectToAction("Posts");
             }
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Posts");
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
         }
 
         [HttpGet]
@@ -101,15 +112,25 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUserPost(int id)
         {
-            var post = _context.Posts.Find(id);
-            string userId = post.UserId;
-            _context.Posts.Remove(post);
-            foreach (var comment in _context.Comments.Where(c => c.PostId == id))
+            try
             {
-                _context.Comments.Remove(comment);
+                var post = _context.Posts.Find(id);
+                string userId = post.UserId;
+                _context.Posts.Remove(post);
+                foreach (var comment in _context.Comments.Where(c => c.PostId == id))
+                {
+                    _context.Comments.Remove(comment);
+                }
+                await _context.SaveChangesAsync();
+                _logger.LogTrace($"Admin deleted post by {post.UserName} saying {post.Text}");
+                return RedirectToAction("UserPosts", new { userId });
             }
-            await _context.SaveChangesAsync();
-            return RedirectToAction("UserPosts", new { userId });
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
+
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

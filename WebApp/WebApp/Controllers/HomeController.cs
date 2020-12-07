@@ -36,7 +36,6 @@ namespace WebApp.Controllers
                 ViewBag.CurrentUserName = currentUser.UserName;
                 ViewBag.UserId = currentUser.Id;
             }
-            _logger.LogError("Something went wrong");
             return View(messages);
         }
 
@@ -51,10 +50,20 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteMessage(int id)
         {
-            var message = _context.Messages.Find(id);
-            _context.Messages.Remove(message);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            try
+            {
+                var message = _context.Messages.Find(id);
+                _context.Messages.Remove(message);
+                await _context.SaveChangesAsync();
+                _logger.LogTrace($"Deleted message by {message.UserName} saying {message.Text}");
+                return RedirectToAction("Index");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
+
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

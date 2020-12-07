@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using WebApp.Data;
 using WebApp.Models;
+using WebApp.Services;
 using WebApp.ViewModels;
 
 namespace WebApp.Controllers
@@ -16,11 +18,11 @@ namespace WebApp.Controllers
     [Authorize]
     public class PrivateMessagesController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly Logger _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public PrivateMessagesController(ApplicationDbContext context, ILogger<HomeController> logger, UserManager<AppUser> manager)
+        public PrivateMessagesController(ApplicationDbContext context, Logger logger, UserManager<AppUser> manager)
         {
             _userManager = manager;
             _logger = logger;
@@ -59,18 +61,33 @@ namespace WebApp.Controllers
         [Route("/PrivateMessages/Chat/{combinedId}")]
         public async Task<IActionResult> Chat(string combinedId)
         {
-            string[] ids = combinedId.Split('_');
-            var sender = await _userManager.GetUserAsync(User);
-            var receiver = ids[0] == sender.Id ? await _context.Users.FindAsync(ids[1]) :
-                await _context.Users.FindAsync(ids[0]);
-            ViewBag.CombinedId = combinedId;
-            ViewBag.ReceiverUserName = receiver.UserName;
+            try
+            {
+                string[] ids = combinedId.Split('_');
+                var sender = await _userManager.GetUserAsync(User);
+                var receiver = ids[0] == sender.Id ? await _context.Users.FindAsync(ids[1]) :
+                    await _context.Users.FindAsync(ids[0]);
+                ViewBag.CombinedId = combinedId;
+                ViewBag.ReceiverUserName = receiver.UserName;
 
-            var messages = _context.PrivateMessages.Where(m => 
-            (m.SenderID == sender.Id && m.ReceiverID == receiver.Id) || 
-            (m.ReceiverID == sender.Id && m.SenderID == receiver.Id));
+                var messages = _context.PrivateMessages.Where(m => 
+                (m.SenderID == sender.Id && m.ReceiverID == receiver.Id) || 
+                (m.ReceiverID == sender.Id && m.SenderID == receiver.Id));
 
-            return View(messages);
+                return View(messages);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
+
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

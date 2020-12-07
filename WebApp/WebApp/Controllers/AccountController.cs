@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using WebApp.Models;
 using WebApp.Services;
 using WebApp.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace WebApp.Controllers
 {
@@ -49,6 +50,8 @@ namespace WebApp.Controllers
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                         $"Confirm registration by using this link: <a href='{callbackUrl}'>link</a>");
 
+                    _logger.LogTrace($"Sent confirmation link to {user.UserName}");
+
                     return Content("To finish registration use the link on you email");
                 }
                 else
@@ -56,6 +59,7 @@ namespace WebApp.Controllers
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
+                        _logger.LogError(error.Description);
                     }
                 }
             }
@@ -68,18 +72,26 @@ namespace WebApp.Controllers
         {
             if (userId == null || code == null)
             {
+                _logger.LogError($"Error while email confirmation");
                 return View("Error");
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
+                _logger.LogError($"User {userId} not found (email confirmation)");
                 return View("Error");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
+            {
+                _logger.LogTrace($"User {user.UserName} confirmed successfully");
                 return RedirectToAction("Index", "Home");
+            }
             else
+            {
+                _logger.LogError($"Email confirmation failed for {user.UserName}");
                 return View("Error");
+            }
         }
     }
 }

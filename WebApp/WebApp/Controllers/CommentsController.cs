@@ -9,17 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApp.Data;
 using WebApp.Models;
+using WebApp.Services;
 
 namespace WebApp.Controllers
 {
     [Authorize]
     public class CommentsController : Controller
     {
-        private readonly ILogger<RecentPostsController> _logger;
+        private readonly Logger _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public CommentsController(ApplicationDbContext context, ILogger<RecentPostsController> logger, UserManager<AppUser> manager)
+        public CommentsController(ApplicationDbContext context, Logger logger, UserManager<AppUser> manager)
         {
             _userManager = manager;
             _logger = logger;
@@ -30,21 +31,37 @@ namespace WebApp.Controllers
         [Route("/Comments/Comments/{postId}")]
         public IActionResult Comments(string postId)
         {
-            ViewBag.PostId = postId;
-            var comments = _context.Comments.Where(c => c.PostId == int.Parse(postId))
-                .OrderByDescending(c => c.Time);
-            return View(comments);
+            try
+            {
+                ViewBag.PostId = postId;
+                var comments = _context.Comments.Where(c => c.PostId == int.Parse(postId))
+                    .OrderByDescending(c => c.Time);
+                return View(comments);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
         }
 
         [HttpGet]
         [Route("/Comments/UserComments/{userId}")]
         public IActionResult UserComments(string userId)
         {
-            var user = _context.Users.Find(userId);
-            var comments = _context.Comments.Where(c => c.UserName == user.UserName)
-                .OrderByDescending(c => c.Time);
-            ViewBag.UserId = userId;
-            return View(comments);
+            try
+            {
+                var user = _context.Users.Find(userId);
+                var comments = _context.Comments.Where(c => c.UserName == user.UserName)
+                    .OrderByDescending(c => c.Time);
+                ViewBag.UserId = userId;
+                return View(comments);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
         }
 
 
@@ -60,15 +77,27 @@ namespace WebApp.Controllers
         [Route("/Comments/CreateComment/{postId}")]
         public async Task<IActionResult> CreateComment(Comment comment)
         {
-            if (ModelState.IsValid)
+            try
             {
-                comment.Id = 0;
-                var sender = await _userManager.GetUserAsync(User);
-                comment.UserName = sender.UserName;
-                comment.Post = _context.Posts.Find(comment.PostId);
-                await _context.Comments.AddAsync(comment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Comments", new { postId = comment.PostId });
+                if (ModelState.IsValid)
+                {
+                    comment.Id = 0;
+                    var sender = await _userManager.GetUserAsync(User);
+                    comment.UserName = sender.UserName;
+                    comment.Post = _context.Posts.Find(comment.PostId);
+                    await _context.Comments.AddAsync(comment);
+                    await _context.SaveChangesAsync();
+                    _logger.LogTrace($"User {comment.UserName} has left comment to {comment.PostId} saying {comment.Text}");
+                    return RedirectToAction("Comments", new { postId = comment.PostId });
+                }
+                else
+                {
+                    _logger.LogTrace($"Failed to create comment to post {comment.PostId}");
+                }
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.Message);
             }
             return Error();
         }
@@ -86,11 +115,20 @@ namespace WebApp.Controllers
         [HttpPost]
         public IActionResult DeleteComment(int id)
         {
-            var comment = _context.Comments.Find(id);
-            var post = _context.Posts.Find(comment.PostId);
-            _context.Comments.Remove(comment);
-            _context.SaveChanges();
-            return RedirectToAction("Comments", new { postId = post.Id });
+            try
+            {
+                var comment = _context.Comments.Find(id);
+                var post = _context.Posts.Find(comment.PostId);
+                _context.Comments.Remove(comment);
+                _context.SaveChanges();
+                _logger.LogTrace($"Deleted comment by {comment.UserName} saying {comment.Text}");
+                return RedirectToAction("Comments", new { postId = post.Id });
+            }
+            catch (Exception e)
+            {
+                _logger.LogTrace(e.Message);
+                return Error();
+            }
         }
 
         [HttpGet]
@@ -104,13 +142,21 @@ namespace WebApp.Controllers
         [HttpPost]
         public IActionResult DeleteUserComment(int id)
         {
-            var comment = _context.Comments.Find(id);
-            var userId = _context.Posts.Find(comment.PostId).UserId;
-            _context.Comments.Remove(comment);
-            _context.SaveChanges();
-            return RedirectToAction("UserComments", new { userId });
+            try
+            {
+                var comment = _context.Comments.Find(id);
+                var userId = _context.Posts.Find(comment.PostId).UserId;
+                _context.Comments.Remove(comment);
+                _context.SaveChanges();
+                _logger.LogTrace($"Admin deleted comment by {comment.UserName} saying {comment.Text}");
+                return RedirectToAction("UserComments", new { userId });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Error();
+            }
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
